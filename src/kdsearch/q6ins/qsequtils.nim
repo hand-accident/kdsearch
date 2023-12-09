@@ -1,4 +1,4 @@
-import q6
+import ../q6
 
 seq.fPureImpl1:
   @[a]

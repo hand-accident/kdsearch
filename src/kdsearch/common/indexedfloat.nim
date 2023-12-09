@@ -1,6 +1,6 @@
 import std/[math]
 
-import q6
+import ../q6
 
 type IndexedValue[T] = tuple[i: int, value: T]
 

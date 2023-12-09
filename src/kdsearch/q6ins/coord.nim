@@ -1,4 +1,4 @@
-import q6
+import ../q6
 type Coord*[T] = tuple[x, y: T]
 
 Coord.fPureImpl1:

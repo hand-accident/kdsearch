@@ -1,4 +1,4 @@
-import q6
+import ../q6
 import std/[sugar]
 
 type
