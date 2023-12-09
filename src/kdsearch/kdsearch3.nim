@@ -62,21 +62,18 @@ proc compoundNearest(
     ): tuple[x, y, z: float] =
   c.get.addHeight(heights[t.findNearest(c).getIndex])
 
-when isMainModule:
+proc execKdSearch*(path: tuple[base, targetHeight, output: string]) =
   var
     pts, txts: seq[Coord[IndexedFloat]]
     hs: seq[float]
 
-  let rootPath = getHomeDir() / "desktop" / "ksgt" / "source" / "csv"
-
-  indexedCachedReadLoop(rootPath / "text_object.txt"):
+  path.targetHeight.indexedCachedReadLoop:
     txts &= i.th x.row.rowToCoord
     hs &= x.row[2].parseFloat
 
-  indexedCachedReadLoop(rootPath / "object.txt"):
+  path.base.indexedCachedReadLoop:
     pts &= i.th x.row.rowToCoord
 
   let t = txts.toKD ZEROBOUND
 
-  pts.mapIt(t.compoundNearest(it, hs)).seqToCsv(rootPath / "result_test3.csv")
-
+  pts.mapIt(t.compoundNearest(it, hs)).seqToCsv(path.output)
