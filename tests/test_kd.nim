@@ -1,6 +1,6 @@
 # import unittest
 
-import kdsearch/kdpartial
+import kdsearch/kdtree
 import kdsearch/common/[types]
 import kdsearch/q6ins/[coord, qsequtils, optionutil]
 import kdsearch/q6
