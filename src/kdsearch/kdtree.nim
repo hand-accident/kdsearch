@@ -62,6 +62,7 @@ proc catOptions[T](s: seq[Option[T]]): seq[T] =
 
 proc memoize[A, B](f: proc(a: A): B): proc(a: A): B =
   ## Returns a memoized version of the given procedure.
+  ## from https://github.com/andreaferretti/memo/blob/master/memo.nim
   var cache = initTable[A, B]()
 
   result = proc(a: A): B =
@@ -136,7 +137,7 @@ proc tighten[T](bound: Bound[T], value: Coord[T], kind: NodeKind,
       else:
         ((bound.l.x, value.y), bound.h)
 
-proc nextSeiving[T](
+proc nextSeivingProgress[T](
     p: SeivingProgress[T], m: MoveKind, pivot: Coord[T]): SeivingProgress[T] =
   let (path, remains, bound, kind) = p
   (path.nextMove(m), remains, bound.tighten(pivot, kind, m), kind.other)
@@ -149,8 +150,8 @@ proc toPathNode[T](props: ConstructionProps[T]): PathNode[T] =
     newBound: Bound[T] = optionalBound.get(bound)
   (path, (kind, pivot, newBound))
 
-proc createPathNodes[T: Arithable](cs: seq[Coord[T]], initialBound: Bound[
-    T]): MovesPathNodes[T] =
+proc createPathNodes[T: Arithable](
+    cs: seq[Coord[T]], initialBound: Bound[T]): MovesPathNodes[T] =
   type
     TheState = State[seq[SeivingProgress[T]], ConstructionProps[T]]
     TheSI = StateInner[seq[SeivingProgress[T]], ConstructionProps[T]]
@@ -161,9 +162,9 @@ proc createPathNodes[T: Arithable](cs: seq[Coord[T]], initialBound: Bound[
         (path, remains, bound, kind) = h
         (lowers, highers, pivot) = remains.sieve kind
       if highers.len > 0:
-        result.state &= (path, highers, bound, kind).nextSeiving(Higher, pivot)
+        result.state &= (path, highers, bound, kind).nextSeivingProgress(Higher, pivot)
       if lowers.len > 0:
-        result.state &= (path, lowers, bound, kind).nextSeiving(Lower, pivot)
+        result.state &= (path, lowers, bound, kind).nextSeivingProgress(Lower, pivot)
       result.value = (pivot, path, bound, kind)
 
   step.dfsLoopWith(initialState, MovesPathNodes[T]):
@@ -179,9 +180,6 @@ proc toKD*[T: Arithable](
     param = moves.genParams
     nextIndex = genNextIndex(param)
     encoding = genEncoding(nextIndex)
-
-  when defined(debug):
-    debugecho (param: param)
 
   var ks: seq[NodeIndex]
   for (path, node) in pathNodes:
